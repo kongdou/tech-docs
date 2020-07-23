@@ -8,6 +8,15 @@ Kafka的基础概念、术语
 - Consumer： 消费者
 - Broker：服务代理节点（kafka实例）
 
+### 消费模型
+#### 队列模式（点对点模式）
+多个消费者读取消息队列，每条消息只发送给一个消费者
+
+#### 发布-订阅模式(pub/sub)
+多个消费者订阅主题，主题的每条记录会发布给所有的消费者
+
+
+
 ## 消息存储
 ### 主题（Topic）
 kafka消息以topic为单位进行归类，逻辑概念
@@ -48,11 +57,12 @@ OSR：Out-of-Sync Replicas同步之后过多的副本组成，OSR内的副本是
 ![偏移量](https://github.com/kongdou/tech-docs/blob/master/images/kafka-offset.png)
 
 
-![高水位](https://github.com/kongdou/tech-docs/blob/master/images/kafka-hw-leo.png)
+
 
 LEO（Log End Offset）：标识当前分区下一条代写入消息的offset  
 HW（High Watermark）：高水位，标识了一个特定的offset，消费者只能拉渠道这个offset之前的消息（不含HW）  
 所有副本都同步了的消息才能被消费，HW的位置取决于所有follower中同步最慢的分区的offset  
+![高水位](https://github.com/kongdou/tech-docs/blob/master/images/kafka-hw-leo.png)  
 ## 消费者组（Consumer Group)
 Consumer group是kafka提供的可扩展且具有容错性的消费者机制。组内多个消费者（实例）共享一个公共的ID，即group ID(consumer.properties配置)，组内的所有消费者协调在一起来消费订阅主题(subscribed topics)的所有分区(partition)。每个分区只能由同一个消费组内的一个consumer来消费。  
 ![消费者组](https://github.com/kongdou/tech-docs/blob/master/images/kafka-consumer-group.png)  
