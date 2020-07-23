@@ -104,22 +104,88 @@ Sticky分配策略是最新的也是最复杂的策略，其具体实现位于pa
 
 三个消费者订阅所有主题
 
-现在订阅情况如下：
+**1.初始化数据**
+![初始化](https://github.com/kongdou/tech-docs/blob/master/images/Kafka-sticky-1.png)
 
-C0：t0p0，t1p1，t3p0
+第一步：所有分区排序（按照分区分配的consumer数量由低到高），如果consumer相同，按照分区数据字典排序（可以理解为名称）,由于每个分区都由三个consumer消费，因此排序结果：
 
-C1：t0p1，t2p0，t3p1
+t0p0、t0p1、t1p0、t1p1、t2p0、t2p1、t3p0、t3p1
 
-C2：t1p0，t2p1
+第二步：将所有的consumer排序（按照consumer已经分配到分区数量排序）由于初始分配，没有分区，排序结果：
 
-假设现在C1挂掉了，如果是RoundRobin分配策略，那么会变成下面这样：
-C0：t0p0，t1p0，t2p0，t3p0
-C2：t0p1，t1p1，t2p1，t3p1
+C0、C1、C2
+
+第三步：依次将分区分配给各个consumer（每次分配后consumer的数量是变化的）
+
+第一次分配:  
+将t0p0分配给C0，由于C0订阅了t0，分配成功，结果：  
+C0：t0p0  
+C1：  
+C2：  
+consumer重新排序（根据已分配到的分区数量），结果：  
+C1：  
+C2:  
+C0：t0p0  
+
+第二次分配：  
+将t0p1分配给C1，由于C1订阅了t0，分配成功，结果：  
+C1：t0p1  
+C2:  
+C0: t0p0  
+consumer重新排序（根据已分配到的分区数量），结果： 
+C2:   
+C0:t0p0  
+C1:t0p1  
+
+依此分配，最终结果：  
+C0：t0p0，t1p1，t3p0  
+C1：t0p1，t2p0，t3p1  
+C2：t1p0，t2p1  
+
+![初始化结果](https://github.com/kongdou/tech-docs/blob/master/images/Kafka-sticky-2.png)
+
+**2.假设C1宕机**
+
+![宕机](https://github.com/kongdou/tech-docs/blob/master/images/Kafka-sticky-3.png)
 
 
-就是说它会全部重新打乱，再分配，而如何使用Sticky分配策略，会变成这样：
-C0：t0p0，t1p1，t3p0，t2p0
-C2：t1p0，t2p1，t0p1，t3p1
+C1消费宕机：需要将分配给C1的分区，分配给C0、C2  
 
-Sticky策略是新版本中新增的策略，顾名思义，这种策略会保证再分配时已经分配过的分区尽量保证其能够继续由当前正在消费的consumer继续消费
+如果按照默认的再平衡（RoundRobin），分配结果：  
+C0：t0p0，t1p0，t2p0，t3p0  
+C2：t0p1，t1p1，t2p1，t3p1  
 
+发现：调整的分区有5个，原有未宕机的consumer消费的分区也被挪动，如C2的t1p0 
+
+按照Sticky策略分配如下：  
+第一步：将分区C1消费的分区排序（根据消费者的数量由低到高排序，如果数量相同，使用数据字典排序）  
+t0p1  
+t2p0  
+t3p1  
+
+第二步：consumer重新排序（根据已分配到的分区数量），结果： 
+C2：t1p0、t2p1  
+C0：t0p0、t1p1、t3p0  
+
+第三步：依次将分区分配到consumer:    
+
+(1) t0p1是否被C2订阅，C2订阅了t0p1，分配成功，此时分配结果：  
+C2：t1p0、t2p1、t0p1  
+C0：t0p0、t1p1、t3p0  
+consumer重新排序（根据已分配到的分区数量,数量相同，根据数据字典），结果： 
+C0：t0p0、t1p1、t3p0  
+C2：t1p0、t2p1、t0p1  
+
+(2) t2p0是否被C0订阅，C0订阅了t2p0，分配成功，此时分配结果：
+C0：t0p0、t1p1、t3p0、t2p0
+C2：t1p0、t2p1、t0p1
+
+consumer重新排序（根据已分配到的分区数量,数量相同，根据数据字典），结果:  
+C2：t1p0、t2p1、t0p1  
+C0：t0p0、t1p1、t3p0、t2p0  
+
+(3) t3p1是否被C2订阅，C2订阅了t3p1，分配成功，此时分配结果:  
+C2：t1p0、t2p1、**t0p1**、**t3p1**  
+C0：t0p0、t1p1、t3p0、**t2p0**  
+
+按照Sticky策略，原来消费者订阅的分区没有挪动，只挪动了C1消费的3个分区  
