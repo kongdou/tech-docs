@@ -112,7 +112,7 @@ C0：t0p0
 C1：t0p1  
 C2:  
 C0: t0p0  
-consumer重新排序（根据已分配到的分区数量），结果： 
+consumer重新排序（根据已分配到的分区数量），结果：  
 C2:   
 C0:t0p0  
 C1:t0p1  
@@ -129,7 +129,7 @@ C2：t1p0，t2p1
 ![宕机](https://github.com/kongdou/tech-docs/blob/master/images/Kafka-sticky-3.png)
 
 
-C1消费宕机：需要将分配给C1的分区，分配给C0、C2  
+C1消费宕机：需要将分配给C1的分区t0p1、t2p0、t3p1分配给C0、C2两个consumer  
 
 如果按照默认的再平衡（RoundRobin），分配结果：  
 C0：t0p0，t1p0，t2p0，t3p0  
@@ -138,12 +138,12 @@ C2：t0p1，t1p1，t2p1，t3p1
 问题：调整的分区有5个，原有未宕机的consumer消费的分区也被挪动，如C2的t1p0 
 
 按照Sticky策略分配如下：  
-第一步：将分区C1消费的分区排序（根据消费者的数量由低到高排序，如果数量相同，使用数据字典排序）  
+第一步：将准备消费的分区排序（根据consumer的数量由低到高排序，如果数量相同，使用数据字典排序）  
 t0p1  
 t2p0  
 t3p1  
 
-第二步：consumer重新排序（根据已分配到的分区数量），结果： 
+第二步：consumer排序（根据已分配到的分区数量），结果： 
 C2：t1p0、t2p1  
 C0：t0p0、t1p1、t3p0  
 
