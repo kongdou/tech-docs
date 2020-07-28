@@ -370,7 +370,7 @@ JVM Stack描述的是Java方法执行的内存模型，每个方法在执行的�
 -XX:NewRatio | 新生代与老年代的比例，如 –XX:NewRatio=2，则新生代占整个堆空间的1/3，老年代占2/3
 -XX:SurvivorRatio | 新生代中 Eden 与 Survivor 的比值。默认值为 8。即 Eden 占新生代空间的 8/10，另外两个 Survivor 各占 1/10 
 -XX:PermSize | 永久代(方法区)的初始大小（1.8+取消）
--XX:MaxPermSize | 永久代(方法区)的最大值
+-XX:MaxPermSize | 永久代(方法区)的最大值（1.8+取消）
 -XX:+PrintGCDetails| 打印 GC 信息
 -XX:+PrintGCDateStamps| 输出GC的时间戳
 -XX:+PrintCompilation|在控制台打印编译过程信息
