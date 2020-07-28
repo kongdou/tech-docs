@@ -226,7 +226,7 @@ JAVA在运行时，当有一个地方引用该对象实例，会将这个对象�
 
 如果对象在进行可行性分析后发现没有与GC Roots相连的引用链，也不会理解死亡。它会暂时被标记上并且进行一次筛选，筛选的条件是是否有必要执行finalize()方法。如果被判定有必要执行finaliza()方法，就会进入F-Queue队列中，并有一个虚拟机自动建立的、低优先级的线程去执行它。稍后GC将对F-Queue中的对象进行第二次小规模标记。如果这时还是没有新的关联出现，那基本上就真的被回收了。
 
-![gc-root.png](https://github.com/kongdou/tech-docs/blob/master/images/gc-root.png.png)
+![gc-root](https://github.com/kongdou/tech-docs/blob/master/images/gc-root.png)
 
 如何选择GC Roots：  
 - 虚拟机栈（栈帧中局部变量表）中应用的对象
@@ -235,13 +235,21 @@ JAVA在运行时，当有一个地方引用该对象实例，会将这个对象�
 - 本地方法栈中JNI引用的对象
 
 #### 标记-清除法（Mark-Sweep）
+![mark-sweep](https://github.com/kongdou/tech-docs/blob/master/images/mark-sweep.png)
 
+JVM会扫描所有的对象实例，通过根搜索算法，将活跃对象进行标记，JVM再一次扫描所有对象，将未标记的对象进行清除，只有清除动作，不作任何的处理，这样导致的结果会存在很多的内存碎片。空间碎片太多可能会导致以后再程序运行过程中需要分配较大对象时，无法找到足够的连续内存二不得不提前触发另一次垃圾收集动作。
 
+#### 复制（copying）
+![copying](https://github.com/kongdou/tech-docs/blob/master/images/copying.png)
+JVM扫描所有对象，通过根搜索算法标记被引用的对象，之后会申请新的内存空间，将标记的对象复制到新的内存空间里，存活的对象复制完，会清空原来的内存空间，将新的内存作为JVM的对象存储空间。这样虽然解决了内存碎片问题，但是如果对象很多，重新申请新的内存空间会很大，在内存不足的场景下，会对JVM运行造成很大的影响
 
+#### 标记-整理（Mark-compact）
+![mark-compact）](https://github.com/kongdou/tech-docs/blob/master/images/mark-compact.png)
+标记整理实际上是在标记清除算法上的优化，执行完标记清除全过程之后，再一次对内存进行整理，将所有存活对象统一向一端移动，这样解决了内存碎片问题。
 
-
-
-https://www.jianshu.com/p/87705dbf15c9
+#### 分代回收
+![fen-dai）](https://github.com/kongdou/tech-docs/blob/master/images/fen-dai.png)
+目前JVM常用回收算法就是分代回收，年轻代以复制算法为主，老年代以标记整理算法为主。原因是年轻代对象比较多，每次垃圾回收都有很多的垃圾对象回收，而且要尽可能快的减少生命周期短的对象，存活的对象较少，这时候复制算法比较适合，只要将有标记的对象复制到另一个内存区域，其余全部清除，并且复制的数量较少，效率较高；而老年代是年轻代筛选出来的对象，被标记比较高，需要删除的对象比较少，显然采用标记整理效率较高。
 
 
 # JVM内存模型
