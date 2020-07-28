@@ -47,7 +47,7 @@ java version "1.8.0_131"
 Java(TM) SE Runtime Environment (build 1.8.0_131-b11)  
 Java HotSpot(TM) 64-Bit Server VM (build 25.131-b11, mixed mode)  
 ```
-mixed mode代表是默认的混合编译模式，除了这种模式外，我们还可以使用-Xint参数强制关闭JIT，只使用解释器的编译模式，也可以使用参数-Xcomp强制虚拟机运行只有JIT的编译模式。  
+mixed mode代表是默认的混合编辑模式，除了这种模式外，我们还可以使用-Xint参数强制关闭JIT，只使用解释器的编译模式，也可以使用参数-Xcomp强制虚拟机运行只有JIT的编译模式。  
 `
 java -Xint -version
 `
@@ -364,16 +364,15 @@ JVM Stack描述的是Java方法执行的内存模型，每个方法在执行的�
 参数 | 说明
 ---|---
 -Xms | 初始堆大小。如：-Xms256m
-
-## 常用参数
--XX:+PrintGCDetails
-
--XX:+PrintGCDateStamps
-
-内联方法参数：
-// 在控制台打印编译过程信息
--XX:+PrintCompilation
-// 解锁对 JVM 进行诊断的选项参数。默认是关闭的，开启后支持一些特定参数对 JVM 进行诊断
--XX:+UnlockDiagnosticVMOptions
-// 将内联方法打印出来
--XX:+PrintInlining
+-Xmx | 最大堆大小。如：-Xmx512m
+-Xmn | 新生代大小。通常为 Xmx 的 1/3 或 1/4。新生代 = Eden + 2 个 Survivor 空间。实际可用空间为=Eden + 1 个 Survivor，即 90% 
+-Xss | JDK1.5+ 每个线程堆栈大小为 1M，一般来说如果栈不是很深的话， 1M 是绝对够用了的。
+-XX:NewRatio | 新生代与老年代的比例，如 –XX:NewRatio=2，则新生代占整个堆空间的1/3，老年代占2/3
+-XX:SurvivorRatio | 新生代中 Eden 与 Survivor 的比值。默认值为 8。即 Eden 占新生代空间的 8/10，另外两个 Survivor 各占 1/10 
+-XX:PermSize | 永久代(方法区)的初始大小（1.8+取消）
+-XX:MaxPermSize | 永久代(方法区)的最大值
+-XX:+PrintGCDetails| 打印 GC 信息
+-XX:+PrintGCDateStamps| 输出GC的时间戳
+-XX:+PrintCompilation|在控制台打印编译过程信息
+-XX:+UnlockDiagnosticVMOptions|解锁对 JVM 进行诊断的选项参数。默认是关闭的，开启后支持一些特定参数对 JVM 进行诊断
+-XX:+PrintInlining|将内联方法打印出来
