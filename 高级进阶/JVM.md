@@ -201,6 +201,20 @@ GC运行时，除GC所需要的线程外的其他所有线程处于等待状态�
 GC回收**堆**和**方法区**的内的对象。  
 当前主流虚拟机（Hotspot VM）的垃圾回收都采用“分代回收”的算法。“分代回收”是基于这样一个事实：对象的生命周期不同，所以针对不同生命周期的对象可以采取不同的回收方式，以便提高回收效率。
 
+![GC](https://github.com/kongdou/tech-docs/blob/master/images/GC.png)
+
+堆=新生代+老年代，不包括永久代（方法区）
+
+### 新生代
+由1个Eden区域和2个Survivor区域，Survivor区域由FromSpace和ToSpace组成。  
+新建的对象都是由新生代分配内存，Eden空间不足会把存活的对象转移到Survivor中，新生代可以通过**-Xmn**控制，也可以通过调节SurvivorRatio控制Eden与Survivor的比例。  
+
+MinorGC过程：采用**复制算法**
+
+### 垃圾回收算法
+#### 复制算法
+
+#### 标记清除算法
 
 https://www.jianshu.com/p/87705dbf15c9
 
