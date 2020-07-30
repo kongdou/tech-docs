@@ -11,7 +11,7 @@ Kafka的基础概念、术语
 ## 消费模型
 ### 队列模式（点对点模式）
 多个消费者读取消息队列，每条消息只发送给一个消费者  
-![queue](https://github.com/kongdou/tech-docs/blob/master/images/kafka-queue.png)    
+![queue](https://github.com/kongdou/tech-docs/blob/master/images/kafka-queue.png)   
 ### 发布-订阅模式(pub/sub)
 多个消费者订阅主题，主题的每条记录会发布给所有的消费者  
 ![topic](https://github.com/kongdou/tech-docs/blob/master/images/kafka-topic.png)  
