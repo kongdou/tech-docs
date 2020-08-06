@@ -22,7 +22,6 @@ https://blog.csdn.net/scandly_java/article/details/51333231
 # AtomicInteger
 
 # volatile
-集群中的zookeeper需要超过半数，整个集群对外才可用
 
 # PriorityQueue
 
